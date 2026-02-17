@@ -1,0 +1,66 @@
+spring:
+  application:
+    name: lab-broken-access-control-springboot
+
+  datasource:
+    url: jdbc:h2:mem:labbac;DB_CLOSE_DELAY=-1;INIT=CREATE SCHEMA IF NOT EXISTS LAB_BAC
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        dialect: org.hibernate.dialect.H2Dialect
+    defer-datasource-initialization: true
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: https://unittestdemoapp.fugerit.org
+          # Public key will be loaded from classpath
+
+# Server configuration
+server:
+  port: 8080
+  error:
+    include-message: always
+    include-binding-errors: always
+
+# SpringDoc OpenAPI (Swagger)
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
+    operations-sorter: method
+    tags-sorter: alpha
+  show-actuator: false
+
+# Logging
+logging:
+  level:
+    root: INFO
+    org.fugerit.java.demo: DEBUG
+    org.springframework.security: DEBUG
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+# JWT configuration (custom properties)
+jwt:
+  demo:
+    issuer: https://unittestdemoapp.fugerit.org
+    duration-minutes: 60
+    public-key-path: security/publicKey.pem
+    private-key-path: security/privateKey.pem

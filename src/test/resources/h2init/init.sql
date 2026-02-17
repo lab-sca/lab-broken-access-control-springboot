@@ -1,0 +1,38 @@
+-- Schema creation
+CREATE SCHEMA IF NOT EXISTS LAB_BAC;
+
+-- Table creation
+CREATE TABLE IF NOT EXISTS LAB_BAC.PEOPLE
+(
+    ID            BIGINT       NOT NULL PRIMARY KEY,
+    FIRST_NAME    VARCHAR(512),
+    LAST_NAME     VARCHAR(512),
+    TITLE         VARCHAR(512),
+    MIN_ROLE      VARCHAR(32),
+    CREATION_DATE TIMESTAMP
+    );
+
+-- Sequence creation
+CREATE SEQUENCE IF NOT EXISTS LAB_BAC.SEQ_PEOPLE 
+    START WITH 10000 
+    INCREMENT BY 1 
+    MAXVALUE 99999999999 
+    CACHE 1;
+
+-- Dati iniziali per Broken Access Control Lab
+-- Usa MERGE per evitare errori di chiave duplicata
+
+MERGE INTO LAB_BAC.PEOPLE (ID, FIRST_NAME, LAST_NAME, TITLE, MIN_ROLE, CREATION_DATE)
+    KEY (ID)
+    VALUES (10000, 'Margherita', 'Hack', 'Astrofisica', null, CURRENT_TIMESTAMP);
+
+MERGE INTO LAB_BAC.PEOPLE (ID, FIRST_NAME, LAST_NAME, TITLE, MIN_ROLE, CREATION_DATE)
+    KEY (ID)
+    VALUES (10001, 'Alan', 'Turing', 'Matematico', null, CURRENT_TIMESTAMP);
+
+MERGE INTO LAB_BAC.PEOPLE (ID, FIRST_NAME, LAST_NAME, TITLE, MIN_ROLE, CREATION_DATE)
+    KEY (ID)
+    VALUES (10002, 'Richard', 'Feynman', 'Fisico', 'admin', CURRENT_TIMESTAMP);
+
+-- Resetta la sequence al valore successivo
+ALTER SEQUENCE LAB_BAC.SEQ_PEOPLE RESTART WITH 10003;
