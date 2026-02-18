@@ -28,7 +28,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -131,6 +130,7 @@ public class DocController {
             summary = "Versione MarkDown del documento (ruoli: admin, user, guest)",
             description = "Generato con Fugerit Venus Doc https://venusdocs.fugerit.org/")
     @GetMapping(value = "/example.md", produces = "text/markdown")
+    @PreAuthorize("hasAnyAuthority('admin', 'user', 'guest')")
     public ResponseEntity<byte[]> markdownExample(Authentication auth) throws IOException {
         return ResponseEntity.ok(processDocument(DocConfig.TYPE_MD, auth));
     }
@@ -195,34 +195,18 @@ public class DocController {
         person.setLastName(request.getLastName());
         person.setTitle(request.getTitle());
         person.setMinRole(request.getMinRole());
+
         person = personRepository.save(person);
 
         AddPersonResponseDTO response = new AddPersonResponseDTO();
         response.setId(person.getId());
         response.setCreationDate(person.getCreationDate());
+
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "La persona è stata creata",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = AddPersonResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Dati non validi (validazione fallita)"),
-            @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente"),
-            @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa"),
-            @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
-    })
-    @Tag(name = "person")
-    @Operation(operationId = "addPerson",
-            summary = "Aggiunge una persona al database (ruoli: admin)",
-            description = "Vanno forniti i parametri, nome, cognome, titolo e ruolo minimo.")
-    @PutMapping(value = "/person/add",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
-    @Transactional
-    public ResponseEntity<AddPersonResponseDTO> addPersonPut(@Valid @RequestBody AddPersonRequestDTO request) {
-        return this.addPerson( request );
-    }
+    // SOLUTION: (X) - una PUT senza controllo di autorizzazione è rimasta abilitata per errore,
+    //                  rimuoviamo totalmente il metodo addPersonPut()
 
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "Dati della persona trovata",
@@ -243,9 +227,16 @@ public class DocController {
         Person person = personRepository.findById(id).orElse(null);
 
         if (person == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+            // SOLUTION: (1) restituiamo FORBIDDEN invece di NOT_FOUND per non rendere gli oggetti enumerabili.
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         } else {
-            return ResponseEntity.ok(person.toDTO());
+            // SOLUTION: (4) verifichiamo se l'utente ha il ruolo minimo richiesto per la persona richiesta.
+            // In caso negativo ritorniamo FORBIDDEN
+            if (person.getMinRole() == null || getRolesFromAuthentication(auth).contains(person.getMinRole())) {
+                return ResponseEntity.ok(person.toDTO());
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+            }
         }
     }
 
@@ -260,14 +251,20 @@ public class DocController {
             summary = "Cancella una persona per ID (ruoli: admin)",
             description = "Cancella un utente")
     @DeleteMapping("/person/delete/{id}")
-    @PreAuthorize("hasAnyAuthority('admin', 'user')")
+    // SOLUTION: (3) Rimuoviamo il ruolo 'user' tra quelli autorizzati.
+    //                Secondo le specifiche, la cancellazione delle persone deve essere consentita solo al ruolo 'admin'
+    @PreAuthorize("hasAnyAuthority('admin')")
     @Transactional
     public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
         Person person = personRepository.findById(id).orElse(null);
+
         if (person == null) {
+            // SOLUTION: (1) Sempre FORBIDDEN, mai NOT_FOUND per evitare ID enumeration
             return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
         }
+
         personRepository.delete(person);
+
         return ResponseEntity.ok().build();
     }
 
@@ -301,6 +298,11 @@ public class DocController {
     /**
      * Metodo worker che genera effettivamente i documenti tramite il framework:
      * https://github.com/fugerit-org/fj-doc ( documentazione: https://venusdocs.fugerit.org/ )
+     *
+     * CONVERSIONE DA QUARKUS:
+     * - In Quarkus questo metodo non aveva parametri perché usava this.securityIdentity
+     *   iniettata come campo della classe.
+     * - In Spring Boot passiamo Authentication come parametro esplicito.
      */
     private byte[] processDocument(String handlerId, Authentication auth) throws IOException {
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
@@ -331,11 +333,14 @@ public class DocController {
     /**
      * Metodo che carica tutte le persone cui l'utente corrente ha accesso.
      *
+     * CONVERSIONE DA QUARKUS:
+     * - securityIdentity.getRoles()                -> getRolesFromAuthentication(auth)
+     * - securityIdentity.getPrincipal().getName()  -> auth.getName()
      */
     private List<Person> listAllPersons(Authentication auth) {
         Set<String> userRoles = getRolesFromAuthentication(auth);
 
-        log.info("user : {}, roles : {}", auth != null ? auth.getName() : "-", userRoles);
+        log.info("user : {}, roles : {}", auth.getName(), userRoles);
 
         List<Person> personsFromDb = this.personRepository.findByRolesOrderedByName(userRoles);
         log.info("Caricate {} persone database", personsFromDb.size());
@@ -345,6 +350,11 @@ public class DocController {
     /**
      * Utility: estrae i ruoli dall'Authentication di Spring Security.
      *
+     * EQUIVALENTE QUARKUS: securityIdentity.getRoles()
+     *
+     * In Quarkus, SecurityIdentity.getRoles() restituisce direttamente un Set<String>
+     * leggendo dal claim 'groups' del JWT.
+     *
      * In Spring Security, dobbiamo estrarre manualmente da Authentication.getAuthorities()
      * che contiene oggetti GrantedAuthority. La mappatura dal claim 'groups' ai ruoli
      * avviene tramite JwtAuthenticationConverter configurato in SecurityConfig.
@@ -353,7 +363,7 @@ public class DocController {
      * @return Set di ruoli come stringhe (es. {"admin", "user"})
      */
     private Set<String> getRolesFromAuthentication(Authentication auth) {
-        return auth == null ? new HashSet<>() : auth.getAuthorities().stream()
+        return auth.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
     }

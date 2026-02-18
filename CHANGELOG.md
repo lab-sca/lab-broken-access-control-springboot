@@ -7,6 +7,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- VULNERABILITY (x)
+- VULNERABILITY (5)
+- VULNERABILITY (4)
+- VULNERABILITY (3)
+- VULNERABILITY (2)
+- VULNERABILITY (1)
+
 ## [1.0.0] - 2026-02-16
 
 ### Added

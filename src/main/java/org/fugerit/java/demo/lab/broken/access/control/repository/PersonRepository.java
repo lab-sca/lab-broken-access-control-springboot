@@ -25,7 +25,7 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
      * @param roles Collection dei ruoli dell'utente
      * @return Lista di Person filtrate e ordinate
      */
-    @Query("SELECT p FROM Person p ORDER BY p.lastName, p.firstName")
+    @Query("SELECT p FROM Person p WHERE p.minRole IS NULL OR p.minRole IN :roles ORDER BY p.lastName, p.firstName")
     List<Person> findByRolesOrderedByName(@Param("roles") Collection<String> roles);
 
     /**

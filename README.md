@@ -4,7 +4,7 @@ Un laboratorio educativo completo per testare e comprendere le vulnerabilità [B
 
 > ⚠️ **ATTENZIONE**: Questo progetto contiene **intenzionalmente vulnerabilità di sicurezza** a scopo educativo. **NON utilizzare in produzione** e **NON esporre pubblicamente** senza aver rimosso tutte le vulnerabilità dimostrative.
 
-> 🔴 Versione vulnerabile
+> 🟢 Versione sanata (git checkout branch-vulnerable per accedere alla versione vulnerabile del progetto)
 
 Le vulnerabilità di tipo [Broken Access Control](https://owasp.org/Top10/2025/A01_2025-Broken_Access_Control/) sono attualmente le più diffuse secondo il progetto [OWASP](https://owasp.org/). Sono al primo posto sia nella [OWASP Top 10](https://owasp.org/Top10/) del [2021](https://owasp.org/Top10/2021/) che [2025](https://owasp.org/Top10/2025/).
 

@@ -55,7 +55,7 @@ public class SecurityConfig {
                         .requestMatchers("/h2-console/**").permitAll()
                         .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
                         .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/doc/example.md").permitAll()
+                        // SOLUTION: (5) rimosso l' endpoint /dco/example.md da quelli per cui era permesso l'accesso indiscriminato
                         // Tutti gli altri endpoint richiedono autenticazione
                         .anyRequest().authenticated()
                 )
