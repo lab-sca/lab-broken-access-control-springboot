@@ -51,9 +51,6 @@ import java.util.UUID;
 @Tag(name = "jwt authorization demo")
 public class DemoJwtGeneratorController {
 
-    private static final String ISSUER = "https://unittestdemoapp.fugerit.org";
-    private static final long JWT_DURATION_IN_MINUTES = 60;
-
     private final JwtEncoder jwtEncoder;
 
     @Value("${app.jwt.issuer:https://unittestdemoapp.fugerit.org}")

@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -101,12 +100,10 @@ public class DocController {
     // ENDPOINT GENERAZIONE DOCUMENTI
     // =========================================================================
 
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "The HTML document content"),
-            @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente"),
-            @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa"),
-            @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
-    })
+    @ApiResponse(responseCode = "200", description = "The HTML document content")
+    @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente")
+    @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa")
+    @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
     @Tag(name = "document")
     @Operation(operationId = "HTMLExample",
             summary = "Versione HTML del documento (ruoli: admin, user)",
@@ -119,12 +116,10 @@ public class DocController {
         return ResponseEntity.ok(processDocument(DocConfig.TYPE_HTML, auth));
     }
 
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "The Markdown document content"),
-            @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente"),
-            @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa"),
-            @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
-    })
+    @ApiResponse(responseCode = "200", description = "The Markdown document content")
+    @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente")
+    @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa")
+    @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
     @Tag(name = "document")
     @Operation(operationId = "MarkdownExample",
             summary = "Versione MarkDown del documento (ruoli: admin, user, guest)",
@@ -135,12 +130,10 @@ public class DocController {
         return ResponseEntity.ok(processDocument(DocConfig.TYPE_MD, auth));
     }
 
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "The AsciiDoc document content"),
-            @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente"),
-            @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa"),
-            @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
-    })
+    @ApiResponse(responseCode = "200", description = "The AsciiDoc document content")
+    @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente")
+    @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa")
+    @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
     @Tag(name = "document")
     @Operation(operationId = "AsciiDocExample",
             summary = "Versione AsciiDoc del documento (ruoli: admin)",
@@ -151,12 +144,10 @@ public class DocController {
         return ResponseEntity.ok(processDocument(DocConfig.TYPE_ADOC, auth));
     }
 
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "The PDF document content"),
-            @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente"),
-            @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa"),
-            @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
-    })
+    @ApiResponse(responseCode = "200", description = "The PDF document content")
+    @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente")
+    @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa")
+    @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
     @Tag(name = "document")
     @Operation(operationId = "PDFExample",
             summary = "Versione PDF del documento (ruoli: admin)",
@@ -171,15 +162,13 @@ public class DocController {
     // ENDPOINT GESTIONE PERSONE
     // =========================================================================
 
-    @ApiResponses({
-            @ApiResponse(responseCode = "201", description = "La persona è stata creata",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = AddPersonResponseDTO.class))),
-            @ApiResponse(responseCode = "400", description = "Dati non validi (validazione fallita)"),
-            @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente"),
-            @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa"),
-            @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
-    })
+    @ApiResponse(responseCode = "201", description = "La persona è stata creata",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = AddPersonResponseDTO.class)))
+    @ApiResponse(responseCode = "400", description = "Dati non validi (validazione fallita)")
+    @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente")
+    @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa")
+    @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
     @Tag(name = "person")
     @Operation(operationId = "addPerson",
             summary = "Aggiunge una persona al database (ruoli: admin)",
@@ -208,14 +197,12 @@ public class DocController {
     // SOLUTION: (X) - una PUT senza controllo di autorizzazione è rimasta abilitata per errore,
     //                  rimuoviamo totalmente il metodo addPersonPut()
 
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Dati della persona trovata",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            schema = @Schema(implementation = PersonResponseDTO.class))),
-            @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente"),
-            @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa"),
-            @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
-    })
+    @ApiResponse(responseCode = "200", description = "Dati della persona trovata",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = PersonResponseDTO.class)))
+    @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente")
+    @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa")
+    @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
     @Tag(name = "person")
     @Operation(operationId = "findPerson",
             summary = "Interroga i dati di una persona per ID (ruoli: admin, user)",
@@ -240,12 +227,10 @@ public class DocController {
         }
     }
 
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Persona cancellata con successo"),
-            @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente"),
-            @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa"),
-            @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
-    })
+    @ApiResponse(responseCode = "200", description = "Persona cancellata con successo")
+    @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente")
+    @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa")
+    @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
     @Tag(name = "person")
     @Operation(operationId = "deletePerson",
             summary = "Cancella una persona per ID (ruoli: admin)",
@@ -268,14 +253,12 @@ public class DocController {
         return ResponseEntity.ok().build();
     }
 
-    @ApiResponses({
-            @ApiResponse(responseCode = "200", description = "Lista delle persone",
-                    content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
-                            array = @ArraySchema(schema = @Schema(implementation = PersonResponseDTO.class)))),
-            @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente"),
-            @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa"),
-            @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
-    })
+    @ApiResponse(responseCode = "200", description = "Lista delle persone",
+            content = @Content(mediaType = MediaType.APPLICATION_JSON_VALUE,
+                    array = @ArraySchema(schema = @Schema(implementation = PersonResponseDTO.class))))
+    @ApiResponse(responseCode = "401", description = "Se l'autenticazione non è presente")
+    @ApiResponse(responseCode = "403", description = "Se l'utente non è autorizzato per la risorsa")
+    @ApiResponse(responseCode = "500", description = "In caso di errori non gestiti")
     @Tag(name = "person")
     @Operation(operationId = "listPersons",
             summary = "Elenca le persone attualmente presenti (ruoli: admin, user)",
