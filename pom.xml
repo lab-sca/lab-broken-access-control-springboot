@@ -27,7 +27,7 @@
         
         <!-- Dependency versions -->
         <fj-doc.version>8.18.1</fj-doc.version>
-        <springdoc-openapi.version>2.7.0</springdoc-openapi.version>
+        <springdoc-openapi.version>3.0.1</springdoc-openapi.version>
         <junit5-tag-check.version>1.2.2</junit5-tag-check.version>
         <lombok.version>1.18.36</lombok.version>
         <rest-assured.version>5.5.0</rest-assured.version>
