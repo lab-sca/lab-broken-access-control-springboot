@@ -43,6 +43,7 @@ Per la versione Quarkus originale, visita: [lab-broken-access-control-quarkus](h
 - [Riferimenti rapidi](#-riferimenti-rapidi)
 - [FAQ / Problemi comuni](#-faq--problemi-comuni)
 - [Licenza](#licenza)
+- [🎁 Bonus — Conversione degli ID in UUID](#-bonus--conversione-degli-id-in-uuid)
 
 ### Contenuti extra
 
@@ -519,3 +520,59 @@ Questo progetto è rilasciato sotto licenza MIT - vedi il file [LICENSE](LICENSE
 **Sviluppato con ❤️ per la community della sicurezza applicativa**
 
 **Spring Boot port**: Community contribution | **Original Quarkus version**: [fugerit79](https://github.com/fugerit79)
+
+---
+
+## 🎁 Bonus — Conversione degli ID in UUID
+
+Come discusso nella sezione [Broken Access Control — Tipologie](#), l'uso di **ID sequenziali** espone l'applicazione a vulnerabilità di tipo **IDOR** (Insecure Direct Object Reference), rendendo banale per un attaccante enumerare le risorse.
+
+Una buona pratica è sostituire gli ID sequenziali con **UUID** casuali come identificatori pubblici delle risorse.
+
+### Modifiche necessarie
+
+**1. `PersonRepository.java`** — aggiungere il metodo di ricerca per UUID:
+```java
+/**
+ * Cerca una persona tramite il campo UUID.
+ *
+ * @param uuid l'UUID della persona da cercare
+ * @return un Optional contenente la {@link Person} corrispondente, o vuoto se non trovata
+ */
+Optional<Person> findByUuid(String uuid);
+```
+
+**2. `DocController.java`** — generare l'UUID alla creazione e usarlo come identificatore nei path:
+
+- Alla creazione della persona, generare un UUID casuale:
+```java
+person.setUuid(UUID.randomUUID().toString());
+```
+- Restituire l'UUID invece dell'ID sequenziale nella risposta:
+```java
+response.setUuid(person.getUuid());
+```
+- Sostituire `{id}` con `{uuid}` negli endpoint `findPerson` e `deletePerson`:
+```
+GET    /doc/person/find/{uuid}
+DELETE /doc/person/delete/{uuid}
+```
+- Aggiornare il mapping delle persone nel `processDocument` includendo l'UUID:
+```java
+.map(person -> new People(
+        person.getFirstName(),
+        person.getLastName(),
+        person.getTitle(),
+        person.getUuid()))
+```
+
+### Perché è importante
+
+| | ID Sequenziale | UUID |
+|---|---|---|
+| Esempio | `/person/find/42` | `/person/find/a3f1c2d4-...` |
+| Enumerabile | ✅ facilmente | ❌ praticamente impossibile |
+| Prevedibile | ✅ sì | ❌ no |
+| Sicurezza | ⚠️ bassa | ✅ alta |
+
+> 💡 L'UUID non sostituisce i controlli di autorizzazione — è un ulteriore livello di difesa. Le vulnerabilità (1), (4) del laboratorio devono comunque essere corrette indipendentemente dall'uso degli UUID.

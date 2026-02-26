@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Aggiunto campo UUID all'entità persona da usare al posto dell' ID numerico sequenziale (Breaking change)
+
+### Fixed
+
+- IDOR, Insecure Direct Object Reference sull'ID delle persone
+
 ## [1.0.1] - 2026-02-17
 
 ### Fixed

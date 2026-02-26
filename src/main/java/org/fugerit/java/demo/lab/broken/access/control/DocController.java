@@ -29,6 +29,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -180,15 +181,15 @@ public class DocController {
     @Transactional
     public ResponseEntity<AddPersonResponseDTO> addPerson(@Valid @RequestBody AddPersonRequestDTO request) {
         Person person = new Person();
+        person.setUuid(UUID.randomUUID().toString());
         person.setFirstName(request.getFirstName());
         person.setLastName(request.getLastName());
         person.setTitle(request.getTitle());
         person.setMinRole(request.getMinRole());
-
         person = personRepository.save(person);
 
         AddPersonResponseDTO response = new AddPersonResponseDTO();
-        response.setId(person.getId());
+        response.setUuid(person.getUuid());
         response.setCreationDate(person.getCreationDate());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -207,11 +208,11 @@ public class DocController {
     @Operation(operationId = "findPerson",
             summary = "Interroga i dati di una persona per ID (ruoli: admin, user)",
             description = "Sul risultato viene verificato che sia presente il ruolo minimo.")
-    @GetMapping(value = "/person/find/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/person/find/{uuid}", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyAuthority('admin', 'user')")
     @Transactional(readOnly = true)
-    public ResponseEntity<PersonResponseDTO> findPerson(@PathVariable Long id, Authentication auth) {
-        Person person = personRepository.findById(id).orElse(null);
+    public ResponseEntity<PersonResponseDTO> findPerson(@PathVariable String uuid, Authentication auth) {
+        Person person = personRepository.findByUuid(uuid).orElse(null);
 
         if (person == null) {
             // SOLUTION: (1) restituiamo FORBIDDEN invece di NOT_FOUND per non rendere gli oggetti enumerabili.
@@ -235,13 +236,13 @@ public class DocController {
     @Operation(operationId = "deletePerson",
             summary = "Cancella una persona per ID (ruoli: admin)",
             description = "Cancella un utente")
-    @DeleteMapping("/person/delete/{id}")
+    @DeleteMapping("/person/delete/{uuid}")
     // SOLUTION: (3) Rimuoviamo il ruolo 'user' tra quelli autorizzati.
     //                Secondo le specifiche, la cancellazione delle persone deve essere consentita solo al ruolo 'admin'
     @PreAuthorize("hasAnyAuthority('admin')")
     @Transactional
-    public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
-        Person person = personRepository.findById(id).orElse(null);
+    public ResponseEntity<Void> deletePerson(@PathVariable String uuid) {
+        Person person = personRepository.findByUuid(uuid).orElse(null);
 
         if (person == null) {
             // SOLUTION: (1) Sempre FORBIDDEN, mai NOT_FOUND per evitare ID enumeration
@@ -297,7 +298,8 @@ public class DocController {
                     .map(person -> new People(
                             person.getFirstName(),
                             person.getLastName(),
-                            person.getTitle()))
+                            person.getTitle(),
+                            person.getUuid()))
                     .toList();
 
             log.info("processDocument handlerId : {}", handlerId);

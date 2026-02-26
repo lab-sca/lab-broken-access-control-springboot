@@ -23,6 +23,9 @@ public class Person {
     @Column(name = "ID")
     private Long id;
 
+    @Column(name = "UUID", length = 64)
+    private String uuid;
+
     @Column(name = "FIRST_NAME", length = 512)
     private String firstName;
 

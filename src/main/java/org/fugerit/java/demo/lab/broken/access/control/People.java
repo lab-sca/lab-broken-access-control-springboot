@@ -15,4 +15,6 @@ public class People {
 
     private String title;
 
+    private String uuid;
+
 }

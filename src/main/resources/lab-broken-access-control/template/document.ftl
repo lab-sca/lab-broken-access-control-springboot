@@ -36,11 +36,12 @@
     </metadata>
     <body>
     <h head-level="1">${docTitle!defaultTitle}</h>
-    <table columns="3" colwidths="30;30;40"  width="100" id="data-table" padding="2">
+    <table columns="4" colwidths="25;25;25;25"  width="100" id="data-table" padding="2">
         <row header="true">
             <cell align="center"><para>Nome</para></cell>
             <cell align="center"><para>Cognome</para></cell>
             <cell align="center"><para>Titolo</para></cell>
+            <cell align="center"><para>ID</para></cell>
         </row>
         <#if listPeople??>
             <#list listPeople as current>
@@ -48,6 +49,7 @@
                     <cell><para>${current.name}</para></cell>
                     <cell><para>${current.surname}</para></cell>
                     <cell><para>${current.title}</para></cell>
+                    <cell><para>${current.uuid}</para></cell>
                 </row>
             </#list>
         </#if>

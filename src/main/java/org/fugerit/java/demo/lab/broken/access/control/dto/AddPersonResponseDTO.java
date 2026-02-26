@@ -10,8 +10,8 @@ import java.time.LocalDateTime;
 @Schema(description = "Risposta dal servizio di aggiunta persona")
 public class AddPersonResponseDTO {
     
-    @Schema(description = "ID della persona creata")
-    private Long id;
+    @Schema(description = "UUID della persona creata")
+    private String uuid;
     
     @Schema(description = "Data di creazione")
     private LocalDateTime creationDate;

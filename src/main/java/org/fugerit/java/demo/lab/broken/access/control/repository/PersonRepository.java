@@ -29,8 +29,8 @@ public interface PersonRepository extends JpaRepository<Person, Long> {
     List<Person> findByRolesOrderedByName(@Param("roles") Collection<String> roles);
 
     /**
-     * Trova una persona per ID
+     * Trova una persona per UUID
      */
-    Optional<Person> findById(Long id);
+    Optional<Person> findByUuid(String uuid);
 
 }
