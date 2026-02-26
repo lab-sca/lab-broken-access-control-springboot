@@ -10,6 +10,8 @@ Le vulnerabilità di tipo [Broken Access Control](https://owasp.org/Top10/2025/A
 
 [![Keep a Changelog v1.1.0 badge](https://img.shields.io/badge/changelog-Keep%20a%20Changelog%20v1.1.0-%23E05735)](CHANGELOG.md)
 [![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](https://opensource.org/licenses/MIT)
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=lab-sca_lab-broken-access-control-quarkus&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=lab-sca_lab-broken-access-control-quarkus)
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=lab-sca_lab-broken-access-control-quarkus&metric=coverage)](https://sonarcloud.io/summary/new_code?id=lab-sca_lab-broken-access-control-quarkus)
 
 ## 🆕 Spring Boot Version
 
