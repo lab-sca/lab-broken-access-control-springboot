@@ -4,6 +4,7 @@ import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import lombok.extern.slf4j.Slf4j;
+import org.fugerit.java.core.cfg.ConfigRuntimeException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,10 +21,13 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.security.KeyFactory;
+import java.security.NoSuchAlgorithmException;
 import java.security.interfaces.RSAPrivateKey;
 import java.security.interfaces.RSAPublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
@@ -82,7 +86,7 @@ public class SecurityConfig {
             return NimbusJwtDecoder.withPublicKey(publicKey).build();
         } catch (Exception e) {
             log.error("❌ Impossibile caricare la chiave pubblica JWT da: {}", publicKeyPath, e);
-            throw new RuntimeException("Impossibile caricare la chiave pubblica JWT da: " + publicKeyPath, e);
+            throw new ConfigRuntimeException("Impossibile caricare la chiave pubblica JWT da: " + publicKeyPath, e);
         }
     }
 
@@ -99,7 +103,7 @@ public class SecurityConfig {
             return new NimbusJwtEncoder(new ImmutableJWKSet<>(new JWKSet(rsaKey)));
         } catch (Exception e) {
             log.error("❌ Impossibile caricare le chiavi RSA per JwtEncoder", e);
-            throw new RuntimeException("Impossibile caricare le chiavi RSA per JwtEncoder", e);
+            throw new ConfigRuntimeException("Impossibile caricare le chiavi RSA per JwtEncoder", e);
         }
     }
 
@@ -121,7 +125,7 @@ public class SecurityConfig {
     // Utility: caricamento chiavi RSA dal classpath
     // =========================================================================
 
-    private RSAPublicKey loadPublicKey(String path) throws Exception {
+    private RSAPublicKey loadPublicKey(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         try (InputStream is = new ClassPathResource(path).getInputStream()) {
             String pem = new String(is.readAllBytes())
                     .replace("-----BEGIN PUBLIC KEY-----", "")
@@ -133,7 +137,7 @@ public class SecurityConfig {
         }
     }
 
-    private RSAPrivateKey loadPrivateKey(String path) throws Exception {
+    private RSAPrivateKey loadPrivateKey(String path) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         try (InputStream is = new ClassPathResource(path).getInputStream()) {
             String pem = new String(is.readAllBytes())
                     .replace("-----BEGIN PRIVATE KEY-----", "")
