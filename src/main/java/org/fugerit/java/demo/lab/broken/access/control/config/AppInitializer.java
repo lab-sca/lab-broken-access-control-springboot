@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.fugerit.java.core.function.SafeFunction;
 import org.fugerit.java.demo.lab.broken.access.control.DocHelper;
 import org.fugerit.java.doc.base.config.InitHandler;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.stereotype.Component;
@@ -45,6 +46,12 @@ import java.sql.DriverManager;
 @Slf4j
 @Component
 public class AppInitializer implements ApplicationRunner {
+
+    @Value("${app.datasource.username:sa}")
+    private String username;
+
+    @Value("${app.datasource.password:}")
+    private String credential;
 
     private final DocHelper docHelper;
 
@@ -108,7 +115,7 @@ public class AppInitializer implements ApplicationRunner {
     private void initDb() {
         SafeFunction.apply(() -> {
             String url = "jdbc:h2:mem:labbac;DB_CLOSE_DELAY=-1;MODE=Oracle;INIT=RUNSCRIPT FROM './src/test/resources/h2init/init.sql';";
-            try (Connection conn = DriverManager.getConnection(url, "sa", "")) {
+            try (Connection conn = DriverManager.getConnection(url, username, credential)) {
                 DatabaseMetaData meta = conn.getMetaData();
                 log.info("Connected to database '{} - {}'", meta.getDatabaseProductName(), meta.getDatabaseProductVersion());
             }
